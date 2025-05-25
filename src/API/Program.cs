@@ -32,14 +32,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("AllowGatewayDev");
-}
-else
-{
-    app.UseCors("AllowGatewayProduction");
-}
+app.UseCors("AllowGatewayDev");
+
+app.UseCors("AllowGatewayProduction");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
