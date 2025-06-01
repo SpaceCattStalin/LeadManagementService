@@ -12,6 +12,10 @@ namespace Infrastructure.Data
 
         }
 
+        public DbSet<Booking> Bookings => Set<Booking>();
+
+        public DbSet<BookingHistory> BookingHistories => Set<BookingHistory>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

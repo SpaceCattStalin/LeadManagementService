@@ -22,4 +22,11 @@
 	</ItemGroup>
 
 
+	<ItemGroup>
+	  <Folder Include="LeadAssignments\" />
+	  <Folder Include="LeadInteractions\" />
+	  <Folder Include="Leads\Queries\" />
+	</ItemGroup>
+
+
 </Project>
