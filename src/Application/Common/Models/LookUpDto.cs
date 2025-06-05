@@ -12,9 +12,8 @@ public class LookupDto
     {
         public Mapping()
         {
-            CreateMap<LeadAssignment, LookupDto>();
-            CreateMap<Lead, LookupDto>();
-            CreateMap<LeadInteraction, LookupDto>();
+            CreateMap<Booking, LookupDto>();
+            CreateMap<BookingHistory, LookupDto>();
         }
     }
 }
