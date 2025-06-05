@@ -11,6 +11,7 @@
 		<PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+		<PackageReference Include="MassTransit" Version="8.4.1" />
 		<PackageReference Include="MediatR" Version="12.5.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
@@ -18,14 +19,17 @@
 
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\SharedContracts\SharedContracts.csproj" />
 	  <ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-	  <Folder Include="LeadAssignments\" />
-	  <Folder Include="LeadInteractions\" />
-	  <Folder Include="Leads\Queries\" />
+	  <Folder Include="UseCases\Commands\ClaimBooking\" />
+	  <Folder Include="UseCases\Commands\UpdateBooking\" />
+	  <Folder Include="UseCases\Queries\GetBookingByIdQuery\" />
+	  <Folder Include="UseCases\Queries\GetAllBookingsQuery\" />
+	  <Folder Include="UseCases\Queries\GetBookingByUserQuery\" />
 	</ItemGroup>
 
 

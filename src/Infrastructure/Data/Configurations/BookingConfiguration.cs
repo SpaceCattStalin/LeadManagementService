@@ -41,6 +41,13 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(b => b.Status)
                 .IsRequired();
 
+            builder.Property(b => b.CreatedByUserId)
+                .IsRequired()
+                .HasMaxLength(36);
+
+            builder.Property(b => b.ClaimedByConsultantId)
+                .HasMaxLength(36);
+
             builder.HasMany(b => b.BookingHistories)
                 .WithOne(h => h.Booking)
                 .HasForeignKey(h => h.BookingId)

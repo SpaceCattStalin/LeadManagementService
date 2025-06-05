@@ -3,7 +3,7 @@ using Domain.Enums;
 
 namespace Domain.Entities
 {
-    public class Booking : BaseAuditableEntity<Guid>
+    public class Booking : BaseEntity<Guid>
     {
         public string UserFullName { get; set; } = default!;
         public string UserEmail { get; set; } = default!;
@@ -14,6 +14,11 @@ namespace Domain.Entities
         public string? InterestedCourse { get; set; }
         public string Reason { get; set; } = default!;
         public BookingStatus Status { get; set; }
+
+        // Microservice-safe foreign references
+        public Guid CreatedByUserId { get; set; }           // External user who made the request
+        public Guid? ClaimedByConsultantId { get; set; }    // Consultant who claimed it (optional)
+
         public ICollection<BookingHistory> BookingHistories { get; set; } = new List<BookingHistory>();
     }
 }
