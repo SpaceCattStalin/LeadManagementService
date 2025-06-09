@@ -15,6 +15,8 @@ using Application.Common.Interfaces.UnitOfWork;
 using Application.Common.Interfaces.Service;
 using MassTransit;
 using Infrastructure.Consumer;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure
 {
@@ -32,6 +34,7 @@ namespace Infrastructure
                 options.UseSqlServer(connectionString);
             });
 
+
             builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
             builder.Services.AddScoped<BookingDbContextInitialiser>();
 
@@ -46,15 +49,13 @@ namespace Infrastructure
             {
                 x.AddConsumer<UserCreatedConsumer>();
                 x.AddConsumer<UserAlreadyExistConsumer>();
-                //x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
-                //{
-                //    o.UseSqlServer();
-                //    o.UseBusOutbox();
-                //});
+
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    cfg.Host("localhost", "/", h =>
+                    var rabbitMqHost = builder.Configuration["MassTransit:Host"] ?? "localhost";
+
+                    cfg.Host(rabbitMqHost, h =>
                     {
                         h.Username("guest");
                         h.Password("guest");
@@ -68,6 +69,8 @@ namespace Infrastructure
                     {
                         e.ConfigureConsumer<UserAlreadyExistConsumer>(context);
                     });
+
+                    cfg.ConfigureEndpoints(context);
                 });
             });
         }

@@ -17,10 +17,17 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(bh => bh.BookingId)
                 .IsRequired();
 
+            builder.Property(bh => bh.PerformedByUserId)
+                .IsRequired();
+
             builder.HasOne(bh => bh.Booking)
                 .WithMany(b => b.BookingHistories)
                 .HasForeignKey(bh => bh.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Optional: Index for query performance
+            builder.HasIndex(bh => bh.BookingId);
+            builder.HasIndex(bh => bh.PerformedByUserId);
         }
     }
 }

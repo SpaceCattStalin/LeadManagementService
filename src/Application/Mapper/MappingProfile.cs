@@ -1,4 +1,6 @@
-﻿using Application.UseCases.Commands.CreateBooking;
+﻿using Application.DTOs;
+using Application.UseCases.Commands.ClaimBooking;
+using Application.UseCases.Commands.CreateBooking;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
@@ -13,11 +15,19 @@ namespace Application.Mapper
         {
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
             ApplyMappingsFromAssembly(currentAssembly);
+            CreateMap<Booking, ResponseBooking>();
+
             CreateMap<CreateBookingCommand, Booking>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => BookingStatus.Waiting))
                 .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.ClaimedByConsultantId, opt => opt.Ignore())
                 .ForMember(dest => dest.BookingHistories, opt => opt.Ignore());
+
+            CreateMap<ClaimBookingCommand, Booking>()
+                .ForMember(dest => dest.FirstContactAttempt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastContactAttempt, opt => opt.Ignore())
+                .ForMember(dest => dest.ContactStatus, opt => opt.Ignore())
+                .ForMember(dest => dest.ContactAttemptsCount, opt => opt.Ignore());
         }
 
         private void ApplyMappingsFromAssembly(Assembly assembly)

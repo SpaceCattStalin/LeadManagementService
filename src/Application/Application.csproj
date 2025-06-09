@@ -19,16 +19,14 @@
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\SharedContracts\SharedContracts.csproj" />
 	  <ProjectReference Include="..\Domain\Domain.csproj" />
+	  <ProjectReference Include="..\SharedContracts\SharedContracts.csproj" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-	  <Folder Include="UseCases\Commands\ClaimBooking\" />
 	  <Folder Include="UseCases\Commands\UpdateBooking\" />
 	  <Folder Include="UseCases\Queries\GetBookingByIdQuery\" />
-	  <Folder Include="UseCases\Queries\GetAllBookingsQuery\" />
 	  <Folder Include="UseCases\Queries\GetBookingByUserQuery\" />
 	</ItemGroup>
 

@@ -3,7 +3,10 @@
     public enum BookingStatus
     {
         Waiting,
-        Approving,
-        Completed
+        Claimed,
+        InProgress,
+        Discarded,
+        CompletedAdmission,
+        CompletedNoInterest
     }
 }

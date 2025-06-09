@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace Infrastructure.Persistence.Configurations
 {
@@ -39,19 +40,42 @@ namespace Infrastructure.Persistence.Configurations
                 .HasMaxLength(1000);
 
             builder.Property(b => b.Status)
-                .IsRequired();
+                .IsRequired()
+                .HasConversion<string>(); // store enum as string, optional
 
             builder.Property(b => b.CreatedByUserId)
-                .IsRequired()
-                .HasMaxLength(36);
+                .IsRequired();
 
             builder.Property(b => b.ClaimedByConsultantId)
-                .HasMaxLength(36);
+                .IsRequired(false);
+
+            builder.Property(b => b.FirstContactAttempt)
+                .IsRequired(false);
+
+            builder.Property(b => b.LastContactAttempt)
+                .IsRequired(false);
+
+            builder.Property(b => b.ContactStatus)
+                .HasConversion<string>()
+                .IsRequired()
+                .HasDefaultValue(Domain.Enums.ContactStatus.NoContact);
+
+            builder.Property(b => b.ContactAttemptsCount)  // fixed typo here
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            builder.Property(b => b.ClaimedAt);
+
+            builder.Property(b => b.CreatedAt)
+                .IsRequired();
 
             builder.HasMany(b => b.BookingHistories)
                 .WithOne(h => h.Booking)
                 .HasForeignKey(h => h.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(b => b.ClaimedByConsultantId);
+            builder.HasIndex(b => b.Status);
         }
     }
 }
