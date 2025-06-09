@@ -1,6 +1,9 @@
+using Application.Common.Interfaces.Service;
 using Application.Mapper;
 using Infrastructure;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -47,23 +50,17 @@ builder.Services.Configure<RouteOptions>(options =>
 {
     options.LowercaseUrls = true;
 });
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowGatewayDev", policy =>
-    {
-        policy.WithOrigins("https://localhost:7149")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowGatewayProduction", policy =>
+    options.AddPolicy("AllowGateway", policy =>
     {
         policy.WithOrigins("http://localhost:8080")
-         .AllowAnyHeader()
-         .AllowAnyMethod();
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+        policy.WithOrigins("https://localhost:7149")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
@@ -93,10 +90,13 @@ builder.Services.AddAuthentication("Bearer")
 
 var app = builder.Build();
 
-app.UseCors("AllowGatewayDev");
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
 
-app.UseCors("AllowGatewayProduction");
-
+app.UseCors("AllowGateway");
 
 if (app.Environment.IsDevelopment())
 {

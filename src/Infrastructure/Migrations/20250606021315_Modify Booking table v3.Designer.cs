@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250606021315_Modify Booking table v3")]
+    partial class ModifyBookingtablev3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,31 +31,13 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ClaimedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid?>("ClaimedByConsultantId")
+                        .HasMaxLength(36)
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ContactAttemptsCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("ContactStatus")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("NoContact");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CreatedByUserId")
+                        .HasMaxLength(36)
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("FirstContactAttempt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("InterestedAcademicField")
                         .HasMaxLength(100)
@@ -70,17 +55,13 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("LastContactAttempt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserEmail")
                         .IsRequired()
@@ -99,10 +80,6 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClaimedByConsultantId");
-
-                    b.HasIndex("Status");
-
                     b.ToTable("Bookings");
                 });
 
@@ -120,23 +97,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NewValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PerformedByUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PreviousValue")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
-
-                    b.HasIndex("PerformedByUserId");
 
                     b.ToTable("BookingHistories");
                 });

@@ -18,6 +18,12 @@ namespace Domain.Entities
         // Microservice-safe foreign references
         public Guid CreatedByUserId { get; set; }           // External user who made the request
         public Guid? ClaimedByConsultantId { get; set; }    // Consultant who claimed it (optional)
+        public DateTime ClaimedAt { get; set; }
+        public DateTime? FirstContactAttempt { get; set; } // When the first contact was attempted
+        public DateTime? LastContactAttempt { get; set; } // When the last contact was attempted
+        public ContactStatus ContactStatus { get; set; } = ContactStatus.NoContact; // Status of contact with the user
+        public int ContactAttemptsCount { get; set; } = 0; // Number of contact attempts made
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // When the booking was created
 
         public ICollection<BookingHistory> BookingHistories { get; set; } = new List<BookingHistory>();
     }
