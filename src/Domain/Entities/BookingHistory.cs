@@ -2,7 +2,7 @@
 
 namespace Domain.Entities
 {
-    public class BookingHistory : BaseAuditableEntity<Guid>
+    public class BookingHistory : BaseEntity<Guid>
     {
         public string Content { get; set; } = default!;
         public Guid BookingId { get; set; }
