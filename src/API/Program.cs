@@ -98,11 +98,11 @@ builder.Services.AddAuthentication("Bearer")
 var app = builder.Build();
 
 // Comment 16/6/2025
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//    dbContext.Database.Migrate();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.UseCors("AllowGateway");
 
