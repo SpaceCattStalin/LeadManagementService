@@ -36,7 +36,7 @@ namespace Application.UseCases.Commands.ClaimBooking
 
             var previousStatus = booking.Status;
             booking.ClaimedByConsultantId = _currentUserService.UserId;
-            booking.Status = BookingStatus.Claimed;
+            booking.Status = BookingStatus.InProgress;
             booking.ClaimedAt = DateTime.UtcNow;
 
             var bookingHistory = new BookingHistory

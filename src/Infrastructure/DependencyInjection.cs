@@ -1,22 +1,24 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Identity;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Service;
+using Application.Common.Interfaces.UnitOfWork;
+using Ardalis.GuardClauses;
+//using Infrastructure.Consumer;
 using Infrastructure.Data;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
+using Infrastructure.UOWork;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Ardalis.GuardClauses;
-using Application.Common.Interfaces.Identity;
-using Infrastructure.Services;
-using Infrastructure.UOWork;
-using Application.Common.Interfaces.Repositories;
-using Infrastructure.Repositories;
-using Application.Common.Interfaces.UnitOfWork;
-using Application.Common.Interfaces.Service;
-using MassTransit;
-using Infrastructure.Consumer;
-using Microsoft.EntityFrameworkCore.Migrations.Internal;
-using Microsoft.EntityFrameworkCore.Migrations;
+using SharedContracts.Booking;
+using SharedContracts.User;
 
 namespace Infrastructure
 {
@@ -33,6 +35,9 @@ namespace Infrastructure
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 options.UseSqlServer(connectionString);
             });
+            Console.WriteLine($"--- DATABASE CONNECTION ATTEMPT ---");
+            Console.WriteLine($"Using connection string: {connectionString}");
+            Console.WriteLine($"--- END DATABASE CONNECTION ---");
 
 
             builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -44,35 +49,34 @@ namespace Infrastructure
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddHttpContextAccessor();
 
-
             builder.Services.AddMassTransit(x =>
             {
-                x.AddConsumer<UserCreatedConsumer>();
-                x.AddConsumer<UserAlreadyExistConsumer>();
+                // 1. Scan the current assembly for any classes that implement IConsumer
+                // This will find any consumers you create in the Infrastructure project.
+                x.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
 
-
+                // 2. Configure MassTransit to use RabbitMQ as the transport
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    var rabbitMqHost = builder.Configuration["MassTransit:Host"] ?? "localhost";
+                    // 3. Read the host, user, and password from configuration/environment variables
+                    var host = builder.Configuration["RABBITMQ_HOST"] ?? "localhost";
+                    var user = builder.Configuration["RABBITMQ_USER"] ?? "guest";
+                    var password = builder.Configuration["RABBITMQ_PASS"] ?? "guest";
 
-                    cfg.Host(rabbitMqHost, h =>
+                    // 4. Set the host connection details
+                    cfg.Host(host, "/", h =>
                     {
-                        h.Username("guest");
-                        h.Password("guest");
+                        h.Username(user);
+                        h.Password(password);
                     });
 
-                    cfg.ReceiveEndpoint("user-created-queue", e =>
-                    {
-                        e.ConfigureConsumer<UserCreatedConsumer>(context);
-                    });
-                    cfg.ReceiveEndpoint("user-already-exist-queue", e =>
-                    {
-                        e.ConfigureConsumer<UserAlreadyExistConsumer>(context);
-                    });
 
+                    // 5. This is the magic! It automatically configures a receive endpoint (a queue)
+                    // for each consumer that was discovered in step 1.
                     cfg.ConfigureEndpoints(context);
                 });
             });
+
         }
     }
 }
