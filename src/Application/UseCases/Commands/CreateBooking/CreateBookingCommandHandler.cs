@@ -56,7 +56,10 @@ namespace Application.UseCases.Commands.CreateBooking
                 PhoneNumber = request.UserPhoneNumber,
                 RequestedAt = DateTime.UtcNow
             };
+            Console.WriteLine($"Publishing event: {@event.FullName} requested a booking at {DateTime.UtcNow}");
             await _publishEndpoint.Publish(@event);
+            Console.WriteLine("Event published!");
+
 
             return await Task.FromResult(booking.Id);
         }

@@ -19,6 +19,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    //if (!builder.Environment.IsDevelopment())
+    //{
+    c.AddServer(new OpenApiServer { Url = "/lead" });
+    //}
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -44,6 +49,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.Configure<RouteOptions>(options =>
@@ -90,19 +97,19 @@ builder.Services.AddAuthentication("Bearer")
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
+// Comment 16/6/2025
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//    dbContext.Database.Migrate();
+//}
 
 app.UseCors("AllowGateway");
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
