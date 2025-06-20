@@ -1,6 +1,6 @@
-﻿namespace SharedContracts.User
+﻿namespace SharedContracts.Booking
 {
-    public class UserCreatedEvent
+    public class UserCreatedFromBookingEvent
     {
         public Guid UserId { get; set; } = default!;
         public string UserEmail { get; set; } = default!;

@@ -11,11 +11,14 @@ namespace Infrastructure.UOWork
         private readonly ApplicationDbContext _context;
         private IDbContextTransaction? _transaction;
         private readonly Dictionary<Type, object> _repositories;
-
+        private static int _instanceCount = 0;
+        public static int InstanceCount => _instanceCount;
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
             _repositories = [];
+            _instanceCount++;
+            Console.WriteLine($"Current UnitOfWork instance count: {InstanceCount}");
         }
 
         // Trả về repository động và đảm bảo chỉ có một instance

@@ -17,8 +17,7 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(bh => bh.BookingId)
                 .IsRequired();
 
-            builder.Property(bh => bh.PerformedByUserId)
-                .IsRequired();
+            builder.Property(bh => bh.PerformedByUserId);
 
             builder.HasOne(bh => bh.Booking)
                 .WithMany(b => b.BookingHistories)

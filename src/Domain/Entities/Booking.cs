@@ -11,12 +11,13 @@ namespace Domain.Entities
         public string? InterestedCampus { get; set; }
         public string? InterestedAcademicField { get; set; }
         public string? InterestedSpecialization { get; set; }
-        public string? InterestedCourse { get; set; }
+        //public string? InterestedCourse { get; set; }
+        public string Location { get; set; } = default!; // Location of the booking (e.g., campus, online)
         public string Reason { get; set; } = default!;
         public BookingStatus Status { get; set; }
 
         // Microservice-safe foreign references
-        public Guid CreatedByUserId { get; set; }           // External user who made the request
+        public Guid? CreatedByUserId { get; set; }           // External user who made the request
         public Guid? ClaimedByConsultantId { get; set; }    // Consultant who claimed it (optional)
         public DateTime ClaimedAt { get; set; }
         public DateTime? FirstContactAttempt { get; set; } // When the first contact was attempted

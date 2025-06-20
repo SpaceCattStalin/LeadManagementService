@@ -1,6 +1,8 @@
 ﻿using Application.UseCases.Commands.CreateBooking;
 using Application.UseCases.Queries.GetAllBookingsQuery;
 using Domain.Common;
+using Domain.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +14,11 @@ namespace API.Controller
     public class BookingsController : CustomControllerBase
     {
         private readonly IMediator _mediator;
-
-        public BookingsController(IMediator mediator)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public BookingsController(IMediator mediator, IPublishEndpoint publishEndpoint)
         {
             _mediator = mediator;
+            _publishEndpoint = publishEndpoint;
         }
         /// <summary>
         /// Retrieves a paginated list of all bookings based on the provided filters.
@@ -27,7 +30,7 @@ namespace API.Controller
         /// <param name="interestedCampus"></param>
         /// <param name="interestedAcademicField"></param>
         /// <param name="interestedSpecialization"></param>
-        /// <param name="interestedCourse"></param>
+        /// <param name="location"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
@@ -39,7 +42,8 @@ namespace API.Controller
             [FromQuery] string? interestedCampus = null,
             [FromQuery] string? interestedAcademicField = null,
             [FromQuery] string? interestedSpecialization = null,
-            [FromQuery] string? interestedCourse = null,
+            //[FromQuery] string? interestedCourse = null,
+            [FromQuery] string? location = null,
             [FromQuery] string? status = null,
             [FromQuery] int pageIndex = 1,
             [FromQuery] int pageSize = 10
@@ -53,7 +57,8 @@ namespace API.Controller
                 InterestedCampus = interestedCampus,
                 InterestedAcademicField = interestedAcademicField,
                 InterestedSpecialization = interestedSpecialization,
-                InterestedCourse = interestedCourse,
+                //InterestedCourse = interestedCourse,
+                Location = location,
                 Status = status,
                 PageNumber = pageIndex,
                 PageSize = pageSize
@@ -70,6 +75,14 @@ namespace API.Controller
             var result = await _mediator.Send(command);
 
             return OkResponse(result);
+            //await _publishEndpoint.Publish(new CreateBookingEvent
+            //{
+            //    UserEmail = command.UserEmail,
+            //    UserFullName = command.UserFullName,
+            //    UserPhoneNumber = command.UserPhoneNumber
+            //});
+
+            //return OkResponse("Booking request accepted and will be processed shortly.");
         }
     }
 }

@@ -6,5 +6,6 @@
         NoResponse,
         InvalidNumber,
         Contacted,
+        Abandoned
     }
 }

@@ -29,7 +29,7 @@ namespace Application.UseCases.Queries.GetAllBookingsQuery
                             && (string.IsNullOrEmpty(request.InterestedCampus) || b.InterestedCampus == request.InterestedCampus)
                             && (string.IsNullOrEmpty(request.InterestedAcademicField) || b.InterestedAcademicField == request.InterestedAcademicField)
                             && (string.IsNullOrEmpty(request.InterestedSpecialization) || b.InterestedSpecialization == request.InterestedSpecialization)
-                            && (string.IsNullOrEmpty(request.InterestedCourse) || b.InterestedCourse == request.InterestedCourse)
+                            && (string.IsNullOrEmpty(request.Location) || b.Location.Contains(request.Location))
                             && (string.IsNullOrEmpty(request.Status) || b.Status.ToString() == request.Status))
                 .OrderByDescending(b => b.CreatedAt);
 

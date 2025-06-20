@@ -9,6 +9,7 @@
         public string? InterestedCampus { get; set; }
         public string? InterestedAcademicField { get; set; }
         public string? InterestedSpecialization { get; set; }
-        public string? InterestedCourse { get; set; }
+        public string Location { get; set; } = default!; // Location of the booking (e.g., campus, online)
+        //public string? InterestedCourse { get; set; }
     }
 }
