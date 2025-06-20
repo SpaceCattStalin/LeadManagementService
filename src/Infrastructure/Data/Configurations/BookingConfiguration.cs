@@ -32,8 +32,11 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(b => b.InterestedSpecialization)
                 .HasMaxLength(100);
 
-            builder.Property(b => b.InterestedCourse)
-                .HasMaxLength(100);
+            //builder.Property(b => b.InterestedCourse)
+            //    .HasMaxLength(100);
+            builder.Property(b => b.Location)
+                .IsRequired()
+                .HasMaxLength(200);
 
             builder.Property(b => b.Reason)
                 .IsRequired()
@@ -43,8 +46,7 @@ namespace Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasConversion<string>(); // store enum as string, optional
 
-            builder.Property(b => b.CreatedByUserId)
-                .IsRequired();
+            builder.Property(b => b.CreatedByUserId);
 
             builder.Property(b => b.ClaimedByConsultantId)
                 .IsRequired(false);

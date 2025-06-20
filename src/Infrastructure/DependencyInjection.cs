@@ -10,6 +10,7 @@ using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Infrastructure.UOWork;
 using MassTransit;
+using MassTransit.Middleware.InMemoryOutbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -41,6 +42,7 @@ namespace Infrastructure
 
 
             builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
             builder.Services.AddScoped<BookingDbContextInitialiser>();
 
             builder.Services.AddScoped<IEmailValidator, EmailValidator>();
@@ -54,7 +56,19 @@ namespace Infrastructure
                 // 1. Scan the current assembly for any classes that implement IConsumer
                 // This will find any consumers you create in the Infrastructure project.
                 x.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
+                //x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+                //{
+                //    // How often the background service checks the outbox for new messages.
+                //    o.QueryDelay = TimeSpan.FromSeconds(10);
 
+                //    // This is a critical setting for performance and reliability. It ensures that when a 
+                //    // consumer also publishes messages, those messages use the outbox, preventing duplicates.
+                //    o.UseBusOutbox();
+                //    o.UseSqlServer();
+                //    // Optional: For high-concurrency, specify your database type.
+                //    // For PostgreSQL: o.UsePostgres();
+                //    // For SQL Server: o.UseSqlServer();
+                //});
                 // 2. Configure MassTransit to use RabbitMQ as the transport
                 x.UsingRabbitMq((context, cfg) =>
                 {

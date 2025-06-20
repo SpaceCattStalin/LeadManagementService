@@ -19,10 +19,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    //if (!builder.Environment.IsDevelopment())
-    //{
-    c.AddServer(new OpenApiServer { Url = "/lead" });
-    //}
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -108,8 +104,12 @@ app.UseCors("AllowGateway");
 
 
 app.UseSwagger();
-app.UseSwaggerUI();
-
+app.UseSwaggerUI(c =>
+{
+    // The endpoint path here is relative to the UI page's path.
+    // If the UI is at /swagger/index.html, it will look for ./v1/swagger.json, which resolves correctly.
+    c.SwaggerEndpoint("v1/swagger.json", "Lead Service API V1");
+});
 
 app.UseHttpsRedirection();
 

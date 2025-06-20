@@ -12,7 +12,8 @@ namespace Application.UseCases.Queries.GetAllBookingsQuery
         public string? InterestedCampus { get; set; }
         public string? InterestedAcademicField { get; set; }
         public string? InterestedSpecialization { get; set; }
-        public string? InterestedCourse { get; set; }
+        //public string? InterestedCourse { get; set; }
+        public string? Location { get; set; } = default!;
         public string? Status { get; set; } = default!;
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;

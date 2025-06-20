@@ -1,19 +1,18 @@
 ﻿using Application.Common.Interfaces.UnitOfWork;
 using Domain.Entities;
 using MassTransit;
-using SharedContracts.User;
+using SharedContracts.Booking;
 
 namespace Infrastructure.Consumer
 {
-    public class UserAlreadyExistConsumer : IConsumer<UserAlreadyExistsEvent>
+    public class UserCreatedFromBookingEventConsumer : IConsumer<UserCreatedFromBookingEvent>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public UserAlreadyExistConsumer(IUnitOfWork unitOfWork)
+        public UserCreatedFromBookingEventConsumer(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-
-        public async Task Consume(ConsumeContext<UserAlreadyExistsEvent> context)
+        public async Task Consume(ConsumeContext<UserCreatedFromBookingEvent> context)
         {
             var email = context.Message.UserEmail;
             var userId = context.Message.UserId;
@@ -21,7 +20,7 @@ namespace Infrastructure.Consumer
             var bookingRepository = _unitOfWork.GetRepository<Booking>();
             var bookingHistoryRepository = _unitOfWork.GetRepository<BookingHistory>();
 
-            var booking = await bookingRepository.FirstOrDefaultAsync(b => b.UserEmail == email && b.CreatedByUserId == null);
+            var booking = await bookingRepository.FirstOrDefaultAsync(b => b.UserEmail == email);
             if (booking != null)
             {
                 booking.CreatedByUserId = userId;
@@ -35,17 +34,7 @@ namespace Infrastructure.Consumer
                 bookingHistoryRepository.Update(bookingHistory);
             }
 
-            try
-            {
-                Console.WriteLine($"Booking ID: {booking.Id}, UserEmail: {booking.UserEmail}, CreatedByUserId: {booking.CreatedByUserId}");
-
-                await _unitOfWork.SaveAsync();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not implemented here)
-                throw new Exception("An error occurred while processing the user already exists event.", ex);
-            }
+            await _unitOfWork.SaveAsync();
         }
     }
 }

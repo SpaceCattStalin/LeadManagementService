@@ -45,8 +45,33 @@ namespace Application.UseCases.Commands.CreateBooking
 
             var booking = _mapper.Map<Booking>(request);
 
-            var repository = _unitOfWork.GetRepository<Booking>();
-            repository.Add(booking);
+            var bookingRepository = _unitOfWork.GetRepository<Booking>();
+
+            var hasWaitingBooking = await bookingRepository.FirstOrDefaultAsync(b =>
+                b.UserEmail == request.UserEmail &&
+                b.UserFullName == request.UserFullName &&
+                b.UserPhoneNumber == request.UserPhoneNumber &&
+                b.Status == BookingStatus.Waiting
+            );
+
+            if (hasWaitingBooking != null)
+            {
+                throw new InvalidOperationException("Bạn đã có một lịch tư vấn.");
+            }
+
+            bookingRepository.Add(booking);
+            await _unitOfWork.SaveAsync();
+
+            var bookingHistoryRepository = _unitOfWork.GetRepository<BookingHistory>();
+            var bookingHistory = new BookingHistory
+            {
+                BookingId = booking.Id,
+                Content = $"Lịch hẹn tư vấn tạo cho người dùng {request.UserFullName}",
+                CreatedAt = DateTime.UtcNow,
+                PreviousValue = null,
+                NewValue = booking.ContactStatus.ToString(),
+            };
+            bookingHistoryRepository.Add(bookingHistory);
             await _unitOfWork.SaveAsync();
 
             var @event = new UserRequestedBookingEvent
@@ -56,6 +81,7 @@ namespace Application.UseCases.Commands.CreateBooking
                 PhoneNumber = request.UserPhoneNumber,
                 RequestedAt = DateTime.UtcNow
             };
+
             Console.WriteLine($"Publishing event: {@event.FullName} requested a booking at {DateTime.UtcNow}");
             await _publishEndpoint.Publish(@event);
             Console.WriteLine("Event published!");
