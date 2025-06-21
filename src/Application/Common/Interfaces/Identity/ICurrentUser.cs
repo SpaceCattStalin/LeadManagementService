@@ -1,6 +1,6 @@
 ﻿namespace Application.Common.Interfaces.Identity
 {
-    public interface ICurrentUserService
+    public interface ICurrentUser
     {
         /// <summary>
         /// Gets the ID of the current user.

@@ -8,13 +8,24 @@ namespace Domain.Common
     {
         public IActionResult OkResponse<T>(T? data)
         {
-            BaseResponse<T> rs = new(
+            var rs = new BaseResponse<T>(
                 statusCode: StatusCodeHelper.OK,
                 code: ResponseCodeConstants.SUCCESS,
                 data: data,
                 message: MessagesConstants.SUCCESS
             );
             return base.Ok(rs);
+        }
+
+        [NonAction]
+        public IActionResult BadRequestResponse(string message)
+        {
+            var rs = new BaseResponse<string>(
+                statusCode: StatusCodeHelper.BadRequest,
+                code: ResponseCodeConstants.BADREQUEST,
+                message: message
+            );
+            return base.BadRequest(rs);
         }
     }
 }

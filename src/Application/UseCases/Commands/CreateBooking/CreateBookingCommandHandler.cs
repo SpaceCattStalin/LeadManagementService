@@ -47,17 +47,17 @@ namespace Application.UseCases.Commands.CreateBooking
 
             var bookingRepository = _unitOfWork.GetRepository<Booking>();
 
-            var hasWaitingBooking = await bookingRepository.FirstOrDefaultAsync(b =>
-                b.UserEmail == request.UserEmail &&
-                b.UserFullName == request.UserFullName &&
-                b.UserPhoneNumber == request.UserPhoneNumber &&
-                b.Status == BookingStatus.Waiting
-            );
+            //var hasWaitingBooking = await bookingRepository.FirstOrDefaultAsync(b =>
+            //    b.UserEmail == request.UserEmail &&
+            //    b.UserFullName == request.UserFullName &&
+            //    b.UserPhoneNumber == request.UserPhoneNumber &&
+            //    b.Status == BookingStatus.Waiting
+            //);
 
-            if (hasWaitingBooking != null)
-            {
-                throw new InvalidOperationException("Bạn đã có một lịch tư vấn.");
-            }
+            //if (hasWaitingBooking != null)
+            //{
+            //    throw new InvalidOperationException("Bạn đã có một lịch tư vấn.");
+            //}
 
             bookingRepository.Add(booking);
             await _unitOfWork.SaveAsync();

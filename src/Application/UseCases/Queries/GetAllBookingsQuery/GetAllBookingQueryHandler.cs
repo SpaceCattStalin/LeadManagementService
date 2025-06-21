@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.UnitOfWork;
+﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.UnitOfWork;
 using Application.Common.Models;
 using Application.DTOs;
 using AutoMapper;
@@ -10,35 +11,40 @@ namespace Application.UseCases.Queries.GetAllBookingsQuery
 {
     public class GetAllBookingQueryHandler : IRequestHandler<GetAllBookingQuery, PaginatedList<ResponseBooking>>
     {
+        private readonly IBookingRepository _bookingRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public GetAllBookingQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetAllBookingQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, IBookingRepository bookingRepository)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _bookingRepository = bookingRepository;
         }
         public async Task<PaginatedList<ResponseBooking>> Handle(GetAllBookingQuery request, CancellationToken cancellationToken)
         {
-            var repository = _unitOfWork.GetRepository<Booking>().Entities;
+            var filter = new BookingFilter
+            {
+                Id = request.Id,
+                Fullname = request.UserFullName,
+                Email = request.UserEmail,
+                Phone = request.UserPhoneNumber,
+                Campus = request.InterestedCampus,
+                AcademicField = request.InterestedAcademicField,
+                Specialization = request.InterestedSpecialization,
+                Location = request.Location,
+                Status = request.Status,
+                ContactStatus = request.ContactStatus
+            };
 
-            var query = repository
-                .Where(b => (string.IsNullOrEmpty(request.UserFullName) || b.UserFullName.Contains(request.UserFullName))
-                            && (string.IsNullOrEmpty(request.UserEmail) || b.UserEmail == request.UserEmail)
-                            && (string.IsNullOrEmpty(request.UserPhoneNumber) || b.UserPhoneNumber == request.UserPhoneNumber)
-                            && (string.IsNullOrEmpty(request.InterestedCampus) || b.InterestedCampus == request.InterestedCampus)
-                            && (string.IsNullOrEmpty(request.InterestedAcademicField) || b.InterestedAcademicField == request.InterestedAcademicField)
-                            && (string.IsNullOrEmpty(request.InterestedSpecialization) || b.InterestedSpecialization == request.InterestedSpecialization)
-                            && (string.IsNullOrEmpty(request.Location) || b.Location.Contains(request.Location))
-                            && (string.IsNullOrEmpty(request.Status) || b.Status.ToString() == request.Status))
-                .OrderByDescending(b => b.CreatedAt);
+            var allResults = await _bookingRepository.SearchAsync(filter);
 
-            var totalCount = query.Count();
+            var totalCount = allResults.Count();
 
-            var items = await query
+            var items = allResults
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .ToListAsync(cancellationToken);
+                .ToList();
 
             var responseList = new List<ResponseBooking>();
             foreach (var item in items)

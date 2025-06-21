@@ -1,9 +1,12 @@
-﻿using Application.UseCases.Commands.CreateBooking;
+﻿using Application.UseCases.Commands.ClaimBooking;
+using Application.UseCases.Commands.CreateBooking;
 using Application.UseCases.Queries.GetAllBookingsQuery;
 using Domain.Common;
+using Domain.Enums;
 using Domain.Events;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +26,6 @@ namespace API.Controller
         /// <summary>
         /// Retrieves a paginated list of all bookings based on the provided filters.
         /// </summary>
-        /// <param name="reason"></param>
         /// <param name="userFullName"></param>
         /// <param name="userEmail"></param>
         /// <param name="userPhoneNumber"></param>
@@ -36,15 +38,17 @@ namespace API.Controller
         /// <returns></returns>
         [HttpGet("get-all-bookings")]
         public async Task<IActionResult> GetAll(
+            [FromQuery] string? id = null,
+            [FromQuery] string? createdByUserId = null,
             [FromQuery] string? userFullName = null,
             [FromQuery] string? userEmail = null,
             [FromQuery] string? userPhoneNumber = null,
             [FromQuery] string? interestedCampus = null,
             [FromQuery] string? interestedAcademicField = null,
             [FromQuery] string? interestedSpecialization = null,
-            //[FromQuery] string? interestedCourse = null,
             [FromQuery] string? location = null,
-            [FromQuery] string? status = null,
+            [FromQuery] BookingStatus? status = null,
+            [FromQuery] ContactStatus? contactStatus = null,
             [FromQuery] int pageIndex = 1,
             [FromQuery] int pageSize = 10
         )
@@ -57,9 +61,9 @@ namespace API.Controller
                 InterestedCampus = interestedCampus,
                 InterestedAcademicField = interestedAcademicField,
                 InterestedSpecialization = interestedSpecialization,
-                //InterestedCourse = interestedCourse,
                 Location = location,
                 Status = status,
+                ContactStatus = contactStatus,
                 PageNumber = pageIndex,
                 PageSize = pageSize
             };
@@ -72,17 +76,39 @@ namespace API.Controller
         [HttpPost("create-consult-booking")]
         public async Task<IActionResult> CreateBooking([FromBody] CreateBookingCommand command)
         {
-            var result = await _mediator.Send(command);
+            try
+            {
+                var result = await _mediator.Send(command);
 
-            return OkResponse(result);
-            //await _publishEndpoint.Publish(new CreateBookingEvent
-            //{
-            //    UserEmail = command.UserEmail,
-            //    UserFullName = command.UserFullName,
-            //    UserPhoneNumber = command.UserPhoneNumber
-            //});
+                return OkResponse(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequestResponse(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(ex.Message);
+            }
 
-            //return OkResponse("Booking request accepted and will be processed shortly.");
+        }
+        [HttpPost("claim-consult-booking")]
+        public async Task<IActionResult> ClaimBooking([FromBody] ClaimBookingCommand command)
+        {
+            try
+            {
+                var result = await _mediator.Send(command);
+
+                return OkResponse(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequestResponse(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(ex.Message);
+            }
         }
     }
 }

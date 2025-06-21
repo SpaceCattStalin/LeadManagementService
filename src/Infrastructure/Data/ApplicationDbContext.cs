@@ -19,10 +19,6 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.AddInboxStateEntity();
-            modelBuilder.AddOutboxMessageEntity();
-            modelBuilder.AddOutboxStateEntity();
-
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }

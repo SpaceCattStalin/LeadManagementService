@@ -10,44 +10,41 @@ namespace Application.UseCases.Commands.ClaimBooking
 {
     public class ClaimBookingCommandHandler : IRequestHandler<ClaimBookingCommand, ResponseBooking>
     {
-        private readonly ICurrentUserService _currentUserService;
+        private readonly ICurrentUser _currentUser;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ClaimBookingCommandHandler(ICurrentUserService currentUserService, IUnitOfWork unitOfWork, IMapper mapper)
+        public ClaimBookingCommandHandler(ICurrentUser currentUser, IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _currentUserService = currentUserService;
+            _currentUser = currentUser;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
         public async Task<ResponseBooking> Handle(ClaimBookingCommand request, CancellationToken cancellationToken)
         {
-            var repository = _unitOfWork.GetRepository<Booking>();
-            var booking = repository.FirstOrDefault(b => b.Id == request.BookingId);
-
-            if (booking == null)
+            if (_currentUser.Role != "Consultant")
             {
-                throw new KeyNotFoundException($"Booking with ID {request.BookingId} not found.");
+                throw new UnauthorizedAccessException("Chỉ có Tư vấn viên mới được nhận lịch tư vấn");
             }
+            var bookingRepository = _unitOfWork.GetRepository<Booking>();
+            var booking = bookingRepository.FirstOrDefault(b => b.Id == request.BookingId);
 
-            if (booking.Status != BookingStatus.Waiting)
-            {
-                throw new InvalidOperationException("This booking has already been claimed or is not in a claimable state.");
-            }
+            var bookingHistoryRepoistory = _unitOfWork.GetRepository<BookingHistory>();
 
             var previousStatus = booking.Status;
-            booking.ClaimedByConsultantId = _currentUserService.UserId;
+            booking.ClaimedByConsultantId = _currentUser.UserId;
             booking.Status = BookingStatus.InProgress;
             booking.ClaimedAt = DateTime.UtcNow;
 
             var bookingHistory = new BookingHistory
             {
                 BookingId = booking.Id,
-                Content = "Booking claimed by consultant.",
+                Content = $"Lịch hẹn được nhận bởi tư vấn viên {_currentUser.UserId}.",
                 PreviousValue = previousStatus.ToString(),
                 NewValue = booking.Status.ToString(),
                 CreatedAt = DateTime.UtcNow,
-                PerformedByUserId = _currentUserService.UserId,
+                PerformedByUserId = _currentUser.UserId,
             };
+            bookingHistoryRepoistory.Add(bookingHistory);
 
             await _unitOfWork.SaveAsync();
 

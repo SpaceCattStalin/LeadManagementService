@@ -6,7 +6,7 @@ namespace Application.UseCases.Commands.ClaimBooking
     public class ClaimBookingCommand : IRequest<ResponseBooking>
     {
         public Guid BookingId { get; set; }
-        public Guid ConsultantId { get; set; }
+        //public Guid ConsultantId { get; set; }
 
     }
 }
